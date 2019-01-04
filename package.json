@@ -1,0 +1,22 @@
+{
+  "name": "imap-searcher",
+  "version": "1.0.0",
+  "description": "For make it easier to list all imboxes, search emails header+body with keywords (and accented or HTML Entities encoded keywords) and Create a json output with these results.",
+  "main": "imapSearcher.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tancou/jsguru-emailJS.git"
+  },
+  "author": "JSGURU",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tancou/jsguru-emailJS/issues"
+  },
+  "homepage": "https://github.com/tancou/jsguru-emailJS#readme",
+  "dependencies": {
+    "imap": "^0.8.19"
+  }
+}
