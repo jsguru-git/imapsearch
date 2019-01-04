@@ -1,7 +1,7 @@
 var Imap = require('imap'),
 		inspect = require('util').inspect;
 var fs = require('fs'), fileStream;
-var criteria = []
+var criterias = []
 
 var imap = new Imap({
   user: 'jsguru@tancou.fr',
@@ -95,35 +95,39 @@ imap.once('ready', function() {
 	*/
 	openInbox(function(err, box) {
 		if (err) throw err;
-		imap.search(criteria, function(err, results) {
-			if (err) throw err;
-			// console.log("UIDs: ", results);
-			// var f = imap.fetch(results, { bodies: '' });
-			var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
-			// var f = imap.fetch(results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
-			f.on('message', function(msg, seqno) {
-				console.log('Message #%d', seqno);
-				var prefix = '(#' + seqno + ') ';
-				msg.on('body', function(stream, info) {
-					console.log(prefix + 'Body', info.which);
-					// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
+		criterias.forEach(criteria => {
+			imap.search(criteria, function(err, results) {
+				if (err) throw err;
+				console.log("UIDs: ", results);
+				/*
+				// var f = imap.fetch(results, { bodies: '' });
+				var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
+				// var f = imap.fetch(results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
+				f.on('message', function(msg, seqno) {
+					console.log('Message #%d', seqno);
+					var prefix = '(#' + seqno + ') ';
+					msg.on('body', function(stream, info) {
+						console.log(prefix + 'Body', info.which);
+						// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
+					});
+					msg.once('attributes', function(attrs) {
+						console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+						// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
+					});
+					msg.once('end', function() {
+						console.log(prefix + 'Finished');
+					});
 				});
-				msg.once('attributes', function(attrs) {
-					console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
-					// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
+				f.once('error', function(err) {
+					console.log('Fetch error: ' + err);
 				});
-				msg.once('end', function() {
-					console.log(prefix + 'Finished');
+				f.once('end', function() {
+					console.log('Done fetching all messages!');
+					imap.end();
 				});
+				*/
 			});
-			f.once('error', function(err) {
-				console.log('Fetch error: ' + err);
-			});
-			f.once('end', function() {
-				console.log('Done fetching all messages!');
-				imap.end();
-			});
-		});
+		})
 	});
 });
 
@@ -185,6 +189,41 @@ imap.once('end', function() {
 									]
 								]
 							]
-	// criteria = [ 'UNSEEN', ['SINCE', 'November 30, 2018'] ];
+	search_terms.forEach(ele => {
+		var searchargs = [];
+		var keywordsCriteria = [];
+		var keywords = ele.keywords.slice(0);
+		var flags = ele.flags;
+		// console.log('before keywords', keywords);
+		if (keywords.length > 0) {
+			var keywords = keywords.map(key => ['TEXT'].concat(key));
+		}
+		if (keywords.length > 1) {
+			keywordsCriteria = mkKeywordsCriteria(keywords.slice(0));
+			searchargs = searchargs.concat(keywordsCriteria);
+		}
+		if (flags.length > 0) {
+			searchargs = searchargs.concat(flags);
+		}
+		// console.log('after keywords', keywords);
+		// console.log('keywordsCriteria', JSON.stringify(keywordsCriteria));
+		console.log('searchargs', JSON.stringify(searchargs));
+		criterias.push(searchargs);
+	});
+
+	// console.log('criterias', JSON.stringify(criterias));
+
+	function mkKeywordsCriteria(keywords) {
+		var firstItm = ['OR'];
+		if (keywords.length > 1) {
+			firstItm = firstItm.concat(keywords.slice(0, 2))
+		}
+		keywords.shift();
+		keywords[0] = firstItm;
+		if (keywords.length > 1) {
+			return mkKeywordsCriteria(keywords);
+		}
+		return keywords;
+	}
 	imap.connect();
 })();
