@@ -106,7 +106,7 @@ imap.once('ready', function() {
 				var prefix = '(#' + seqno + ') ';
 				msg.on('body', function(stream, info) {
 					console.log(prefix + 'Body', info.which);
-					stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
+					// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
 				});
 				msg.once('attributes', function(attrs) {
 					console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
