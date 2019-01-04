@@ -166,13 +166,13 @@ imap.once('end', function() {
 	
 	if (!Array.isArray(search_terms))
 		throw new Error('Expected array for search criteria');
-	criteria = 	[
-								['OR',
+	criterias = 	[
+								// ['OR',
 									[
-										['OR',
-											'SEEN',
-											'ANSWERED'
-										],
+										// ['OR',
+										// 	'SEEN',
+										// 	'ANSWERED'
+										// ],
 										'UNDRAFT', 'UNDELETED',
 										['OR',
 											['TEXT', '6 janvier 1978'],
@@ -180,15 +180,16 @@ imap.once('end', function() {
 										]
 									],
 									[
-										'SEEN',
+										// 'SEEN',
 										'UNDRAFT', 'UNDELETED',
 										['OR',
 											['TEXT', 'Informatique et Libertés'],
 											['TEXT', 'L121-21']
 										]
 									]
-								]
+								// ]
 							]
+	/*
 	search_terms.forEach(ele => {
 		var searchargs = [];
 		var keywordsCriteria = [];
@@ -210,6 +211,7 @@ imap.once('end', function() {
 		console.log('searchargs', JSON.stringify(searchargs));
 		criterias.push(searchargs);
 	});
+	*/
 
 	// console.log('criterias', JSON.stringify(criterias));
 
