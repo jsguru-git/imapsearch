@@ -175,14 +175,14 @@ imap.once('end', function() {
 								// 			['TEXT', 'Conditions Générales de Ventes']
 								// 		]
 								// 	],
-									// [
+									[
 										'SEEN',
 										'UNDRAFT', 'UNDELETED',
 										['OR',
 											['TEXT', 'Informatique et Libertés'],
 											['TEXT', 'L121-21']
 										]
-									// ]
+									]
 								// ]
 							]
 	// criteria = [ 'UNSEEN', ['SINCE', 'November 30, 2018'] ];
