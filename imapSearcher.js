@@ -163,18 +163,18 @@ imap.once('end', function() {
 	if (!Array.isArray(search_terms))
 		throw new Error('Expected array for search criteria');
 	criteria = 	[
-								// ['OR',
-								// 	[
-								// 		['OR',
-								// 			'SEEN',
-								// 			'ANSWERED'
-								// 		],
-								// 		'UNDRAFT', 'UNDELETED',
-								// 		['OR',
-								// 			['TEXT', '6 janvier 1978'],
-								// 			['TEXT', 'Conditions Générales de Ventes']
-								// 		]
-								// 	],
+								['OR',
+									[
+										['OR',
+											'SEEN',
+											'ANSWERED'
+										],
+										'UNDRAFT', 'UNDELETED',
+										['OR',
+											['TEXT', '6 janvier 1978'],
+											['TEXT', 'Conditions Générales de Ventes']
+										]
+									],
 									[
 										'SEEN',
 										'UNDRAFT', 'UNDELETED',
@@ -183,7 +183,7 @@ imap.once('end', function() {
 											['TEXT', 'L121-21']
 										]
 									]
-								// ]
+								]
 							]
 	// criteria = [ 'UNSEEN', ['SINCE', 'November 30, 2018'] ];
 	imap.connect();
