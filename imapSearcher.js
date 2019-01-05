@@ -34,8 +34,8 @@ function extractMessags(w_results) {
 				buffer += chunk.toString('utf8');
 			});
 			stream.once('end', function() {
-				header = inspect(Imap.parseHeader(buffer));
-				console.log(prefix + 'Parsed header: %s', header);
+				header = Imap.parseHeader(buffer);
+				console.log(prefix + 'Parsed header: %s', inspect(header));
 			});
 		});
 		msg.once('attributes', function(attrs) {
