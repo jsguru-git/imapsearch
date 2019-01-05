@@ -41,7 +41,7 @@ function extractMessags(w_results) {
 		msg.once('attributes', function(attrs) {
 			console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
 			uid = attrs.uid;
-			weight = w_results[uid.toString()].weight;
+			weight = w_results[uid.toString()];
 			flags = attrs.flags;
 			// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
 		});
