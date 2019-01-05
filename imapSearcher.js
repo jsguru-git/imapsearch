@@ -111,6 +111,8 @@ imap.once('ready', function() {
 				})
 			});
 			console.log('weighted result', weightedResult);
+			var unionResult = Object.keys(weightedResult).map(ele => ele.toString());
+			console.log('union result', unionResult);
 		});
 
 		function searchPromise(searchTerm) {
