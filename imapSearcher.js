@@ -11,14 +11,6 @@ var imap = new Imap({
   tls: true
 });
 
-Array.prototype.groupBy = function (funcProp) {
-	return this.reduce(function (acc, val) {
-		(acc[funcProp(val)] = acc[funcProp(val)] || []).push(val);
-		return acc;
-	}, {});
-};
-
-
 function openInbox(cb) {
   imap.openBox('INBOX', true, cb);
 }
@@ -57,7 +49,6 @@ function extractMessags(w_results) {
 		});
 		msg.once('end', function() {
 			var msgInfo = {uid, weight, flags, header};
-			msgInfoArr.push(msgInfo);
 			(msgInfoArr[domain] = msgInfoArr[domain] || []).push(msgInfo);
 			console.log(prefix + 'message Info:', msgInfo);
 			console.log(prefix + 'Finished');
