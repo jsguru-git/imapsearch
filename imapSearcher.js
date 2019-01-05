@@ -17,22 +17,37 @@ function openInbox(cb) {
   imap.openBox('INBOX', true, cb);
 }
 
-function extractMessags(results) {
-	// var f = imap.fetch(results, { bodies: '' });
-	// var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
-	var f = imap.fetch(results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
+function extractMessags(w_results) {
+	var uid, weight, header, flags, matched_keywords;
+	var u_results = Object.keys(w_results).map(ele => +ele);
+	// var f = imap.fetch(w_results, { bodies: '' });
+	// var f = imap.fetch(w_results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
+	var f = imap.fetch(u_results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
 	f.on('message', function(msg, seqno) {
 		console.log('Message #%d', seqno);
 		var prefix = '(#' + seqno + ') ';
 		msg.on('body', function(stream, info) {
-			console.log(prefix + 'Body', info.which);
+			// console.log(prefix + 'Body', info.which);
 			// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
+			var buffer = '';
+			stream.on('data', function(chunk) {
+				buffer += chunk.toString('utf8');
+			});
+			stream.once('end', function() {
+				header = inspect(Imap.parseHeader(buffer));
+				console.log(prefix + 'Parsed header: %s', header);
+			});
 		});
 		msg.once('attributes', function(attrs) {
 			console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+			uid = attrs.uid;
+			weight = w_results[uid.toString()].weight;
+			flags = attrs.flags;
 			// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
 		});
 		msg.once('end', function() {
+			var msgInfo = {uid, weight, flags, header};
+			console.log("message Info: ", msgInfo);
 			console.log(prefix + 'Finished');
 		});
 	});
@@ -139,9 +154,9 @@ imap.once('ready', function() {
 				})
 			});
 			console.log('weighted result', weightedResult);
-			var unionResult = Object.keys(weightedResult).map(ele => +ele);
-			// extractMessags(unionResult);
-			extractMessags([2785, 2786, 2787]);
+			
+			// extractMessags(weightedResult);
+			extractMessags({'2785': 25, '2786': 15, '2787': 10});
 		});
 
 		function searchPromise(criteriaW, index) {
