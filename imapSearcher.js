@@ -159,8 +159,8 @@ imap.once('ready', function() {
 			});
 			console.log('weighted result', weightedResult);
 			
-			// extractMessags(weightedResult);
-			extractMessags({'2785': 25, '2786': 15, '2787': 10});
+			extractMessags(weightedResult);
+			// extractMessags({'2785': 25, '2786': 15, '2787': 10});
 		});
 
 		function searchPromise(criteriaW, index) {
