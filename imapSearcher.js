@@ -63,7 +63,7 @@ function extractMessags(w_results) {
 				return (obj2.weight - obj1.weight)
 			});
 		}
-		console.log('message infos by domain', msgInfoArr);
+		console.log('message infos by domain', inspect(msgInfoArr));
 		console.log('Done fetching all messages!');
 		imap.end();
 	});
