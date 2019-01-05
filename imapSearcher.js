@@ -17,7 +17,7 @@ function openInbox(cb) {
 
 function extractMessags(w_results) {
 	var uid, weight, header, flags, matched_keywords, domain,
-			msgInfoArr = {},		
+			msgArrByDomain = {},		
 			u_results = Object.keys(w_results).map(ele => +ele);
 
 	// var f = imap.fetch(w_results, { bodies: '' });
@@ -49,7 +49,7 @@ function extractMessags(w_results) {
 		});
 		msg.once('end', function() {
 			var msgInfo = {uid, weight, flags, header};
-			(msgInfoArr[domain] = msgInfoArr[domain] || []).push(msgInfo);
+			(msgArrByDomain[domain] = msgArrByDomain[domain] || []).push(msgInfo);
 			console.log(prefix + 'message Info:', msgInfo);
 			console.log(prefix + 'Finished');
 		});
@@ -58,12 +58,15 @@ function extractMessags(w_results) {
 		console.log('Fetch error: ' + err);
 	});
 	f.once('end', function() {
-		for (domain in msgInfoArr) {
-			msgInfoArr[domain].sort((obj1, obj2) => {
+		for (domain in msgArrByDomain) {
+			msgArrByDomain[domain].sort((obj1, obj2) => {
 				return (obj2.weight - obj1.weight)
 			});
 		}
-		console.log('message infos by domain', inspect(msgInfoArr));
+		
+		var finalResult = {};
+		finalResult[emails] = {domains: msgArrByDomain};
+		console.log('Final Results', inspect(finalResult));
 		console.log('Done fetching all messages!');
 		imap.end();
 	});
