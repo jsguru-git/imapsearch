@@ -66,7 +66,7 @@ function extractMessags(w_results) {
 		
 		var finalResult = {};
 		finalResult.emails = {domains: msgArrByDomain};
-		console.log('Final Results', JSON.stringify(finalResult));
+		console.log('Final Results', inspect(finalResult, false, 8));
 		console.log('Done fetching all messages!');
 		imap.end();
 	});
