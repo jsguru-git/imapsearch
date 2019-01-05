@@ -96,49 +96,77 @@ imap.once('ready', function() {
 	openInbox(function(err, box) {
 		if (err) throw err;
 		var weightedResult = {}
-		criterias.forEach(itm => {
-			imap.search(itm.criteria, function(err, results) {
-				if (err) throw err;
-				console.log("UIDs: ", results);
-				results.forEach(ele => {
-					var key = ele.toString();
-					if (key in weightedResult) {
-						weightedResult[key] += itm.weight;
-					} else {
-						weightedResult[key] = itm.weight;
-					}
-				});
-				console.log('weighted result', weightedResult);
-				/*
-				// var f = imap.fetch(results, { bodies: '' });
-				var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
-				// var f = imap.fetch(results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
-				f.on('message', function(msg, seqno) {
-					console.log('Message #%d', seqno);
-					var prefix = '(#' + seqno + ') ';
-					msg.on('body', function(stream, info) {
-						console.log(prefix + 'Body', info.which);
-						// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
-					});
-					msg.once('attributes', function(attrs) {
-						console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
-						// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
-					});
-					msg.once('end', function() {
-						console.log(prefix + 'Finished');
-					});
-				});
-				f.once('error', function(err) {
-					console.log('Fetch error: ' + err);
-				});
-				f.once('end', function() {
-					console.log('Done fetching all messages!');
-					imap.end();
-				});
-				*/
+
+		Promise.all(criterias.map(itm => {
+			return searchPromise(itm);
+		})).then(arr => {
+			arr.forEach(ele => {
+				var key = ele.toString();
+				if (key in weightedResult) {
+					weightedResult[key] += searchTerm.weight;
+				} else {
+					weightedResult[key] = searchTerm.weight;
+				}
 			});
+			console.log('weighted result', weightedResult);
 		});
-		console.log('weighted result', weightedResult);
+
+		function searchPromise(searchTerm) {
+			return new Promise((resolve, reject) => {
+				imap.search(searchTerm.criteria, function(err, results) {
+					if (err) {
+						reject(err);
+						throw err;
+					};
+					console.log("UIDs: ", results);
+					resolve(results);
+				})
+			})
+		}
+
+		// criterias.forEach(itm => {
+		// 	imap.search(itm.criteria, function(err, results) {
+		// 		if (err) throw err;
+		// 		console.log("UIDs: ", results);
+		// 		results.forEach(ele => {
+		// 			var key = ele.toString();
+		// 			if (key in weightedResult) {
+		// 				weightedResult[key] += itm.weight;
+		// 			} else {
+		// 				weightedResult[key] = itm.weight;
+		// 			}
+		// 		});
+		// 		console.log('weighted result', weightedResult);
+		// 		/*
+		// 		// var f = imap.fetch(results, { bodies: '' });
+		// 		var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
+		// 		// var f = imap.fetch(results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
+		// 		f.on('message', function(msg, seqno) {
+		// 			console.log('Message #%d', seqno);
+		// 			var prefix = '(#' + seqno + ') ';
+		// 			msg.on('body', function(stream, info) {
+		// 				console.log(prefix + 'Body', info.which);
+		// 				// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
+		// 			});
+		// 			msg.once('attributes', function(attrs) {
+		// 				console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+		// 				// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
+		// 			});
+		// 			msg.once('end', function() {
+		// 				console.log(prefix + 'Finished');
+		// 			});
+		// 		});
+		// 		f.once('error', function(err) {
+		// 			console.log('Fetch error: ' + err);
+		// 		});
+		// 		f.once('end', function() {
+		// 			console.log('Done fetching all messages!');
+		// 			imap.end();
+		// 		});
+		// 		*/
+		// 	});
+		// });
+		// console.log('weighted result', weightedResult);
 	});
 });
 
