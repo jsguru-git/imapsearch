@@ -100,13 +100,15 @@ imap.once('ready', function() {
 		Promise.all(criterias.map(itm => {
 			return searchPromise(itm);
 		})).then(arr => {
-			arr.forEach((ele, idx) => {
-				var key = ele.toString();
-				if (key in weightedResult) {
-					weightedResult[key] += criterias[idx].weight;
-				} else {
-					weightedResult[key] = criterias[idx].weight;
-				}
+			arr.forEach((subArr, idx) => {
+				subArr.forEach(ele => {
+					var key = ele.toString();
+					if (key in weightedResult) {
+						weightedResult[key] += criterias[idx].weight;
+					} else {
+						weightedResult[key] = criterias[idx].weight;
+					}
+				})
 			});
 			console.log('weighted result', weightedResult);
 		});
