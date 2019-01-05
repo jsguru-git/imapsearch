@@ -58,6 +58,15 @@ function extractMessags(w_results) {
 		console.log('Fetch error: ' + err);
 	});
 	f.once('end', function() {
+		for (domain in msgInfoArr) {
+			msgInfoArr[domain].sort((obj1, obj2) => {
+				if (obj1.weight > obj2.weight) {
+					return 1;
+				} else {
+					return -1;
+				}
+			});
+		}
 		console.log('message infos by domain', msgInfoArr);
 		console.log('Done fetching all messages!');
 		imap.end();
