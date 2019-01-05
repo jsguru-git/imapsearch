@@ -11,6 +11,12 @@ var imap = new Imap({
   tls: true
 });
 
+Array.prototype.groupBy = function (funcProp) {
+	return this.reduce(function (acc, val) {
+		(acc[funcProp(val)] = acc[funcProp(val)] || []).push(val);
+		return acc;
+	}, {});
+};
 
 
 function openInbox(cb) {
@@ -18,8 +24,10 @@ function openInbox(cb) {
 }
 
 function extractMessags(w_results) {
-	var uid, weight, header, flags, matched_keywords;
-	var u_results = Object.keys(w_results).map(ele => +ele);
+	var uid, weight, header, flags, matched_keywords, domain,
+			msgInfoArr = {},		
+			u_results = Object.keys(w_results).map(ele => +ele);
+
 	// var f = imap.fetch(w_results, { bodies: '' });
 	// var f = imap.fetch(w_results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
 	var f = imap.fetch(u_results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
@@ -35,19 +43,23 @@ function extractMessags(w_results) {
 			});
 			stream.once('end', function() {
 				header = Imap.parseHeader(buffer);
-				console.log(prefix + 'Parsed header: %s', inspect(header));
+				var sender = header.from[0].split('<').pop().split('>').shift();
+				domain = sender.split('@').pop();
+				// console.log(prefix + 'Parsed header: %s', inspect(header));
 			});
 		});
 		msg.once('attributes', function(attrs) {
-			console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+			// console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
 			uid = attrs.uid;
-			weight = w_results[uid.toString()];
+			weight = w_results[uid];
 			flags = attrs.flags;
 			// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
 		});
 		msg.once('end', function() {
 			var msgInfo = {uid, weight, flags, header};
-			console.log("message Info: ", msgInfo);
+			msgInfoArr.push(msgInfo);
+			(msgInfoArr[domain] = msgInfoArr[domain] || []).push(msgInfo);
+			console.log(prefix + 'message Info:', msgInfo);
 			console.log(prefix + 'Finished');
 		});
 	});
@@ -55,6 +67,7 @@ function extractMessags(w_results) {
 		console.log('Fetch error: ' + err);
 	});
 	f.once('end', function() {
+		console.log('message infos by domain', msgInfoArr);
 		console.log('Done fetching all messages!');
 		imap.end();
 	});
@@ -145,7 +158,7 @@ imap.once('ready', function() {
 		})).then(arr => {
 			arr.forEach((subArr, idx) => {
 				subArr.forEach(ele => {
-					var key = ele.toString();
+					var key = ele;
 					if (key in weightedResult) {
 						weightedResult[key] += criterias[idx].weight;
 					} else {
