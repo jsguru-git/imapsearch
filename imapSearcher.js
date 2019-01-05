@@ -100,7 +100,7 @@ imap.once('ready', function() {
 		Promise.all(criterias.map(itm => {
 			return searchPromise(itm);
 		})).then(arr => {
-			arr.forEach(ele, idx => {
+			arr.forEach((ele, idx) => {
 				var key = ele.toString();
 				if (key in weightedResult) {
 					weightedResult[key] += criterias[idx].weight;
