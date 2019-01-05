@@ -66,8 +66,9 @@ function extractMessags(w_results) {
 		
 		var finalResult = {};
 		finalResult.emails = {domains: msgArrByDomain};
-		console.log('Final Results', inspect(finalResult, false, 8));
+		// console.log('Final Results', inspect(finalResult, false, 8));
 		console.log('Done fetching all messages!');
+		fs.writeFileSync('./data.json', inspect(finalResult, false, 8), 'utf-8');
 		imap.end();
 	});
 }
