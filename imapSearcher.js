@@ -108,6 +108,7 @@ imap.once('ready', function() {
 						weightedResult[key] = itm.weight;
 					}
 				});
+				console.log('weighted result', weightedResult);
 				/*
 				// var f = imap.fetch(results, { bodies: '' });
 				var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
