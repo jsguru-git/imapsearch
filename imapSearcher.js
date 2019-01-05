@@ -17,6 +17,34 @@ function openInbox(cb) {
   imap.openBox('INBOX', true, cb);
 }
 
+function extractMessags(results) {
+	// var f = imap.fetch(results, { bodies: '' });
+	// var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
+	var f = imap.fetch(results, { bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)' });
+	f.on('message', function(msg, seqno) {
+		console.log('Message #%d', seqno);
+		var prefix = '(#' + seqno + ') ';
+		msg.on('body', function(stream, info) {
+			console.log(prefix + 'Body', info.which);
+			// stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt', {'flags': 'a'}));
+		});
+		msg.once('attributes', function(attrs) {
+			console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+			// console.log(prefix + 'struct: %s', inspect(attrs.struct, false, 8));
+		});
+		msg.once('end', function() {
+			console.log(prefix + 'Finished');
+		});
+	});
+	f.once('error', function(err) {
+		console.log('Fetch error: ' + err);
+	});
+	f.once('end', function() {
+		console.log('Done fetching all messages!');
+		imap.end();
+	});
+}
+
 imap.once('ready', function() {
 	/*
   openInbox(function(err, box) {
@@ -112,6 +140,8 @@ imap.once('ready', function() {
 			});
 			console.log('weighted result', weightedResult);
 			var unionResult = Object.keys(weightedResult).map(ele => +ele);
+			// extractMessags(unionResult);
+			extractMessags([2785, 2786, 2787]);
 		});
 
 		function searchPromise(criteriaW, index) {
