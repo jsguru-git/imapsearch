@@ -61,9 +61,9 @@ function extractMessags(w_results) {
 		for (domain in msgInfoArr) {
 			msgInfoArr[domain].sort((obj1, obj2) => {
 				if (obj1.weight > obj2.weight) {
-					return 1;
-				} else {
 					return -1;
+				} else {
+					return 1;
 				}
 			});
 		}
