@@ -1,7 +1,7 @@
 var Imap = require('imap'),
 		inspect = require('util').inspect;
 var fs = require('fs'), fileStream;
-var criterias = []
+var criterias = [];
 
 var imap = new Imap({
   user: 'jsguru@tancou.fr',
@@ -95,10 +95,19 @@ imap.once('ready', function() {
 	*/
 	openInbox(function(err, box) {
 		if (err) throw err;
-		criterias.forEach(criteria => {
-			imap.search(criteria, function(err, results) {
+		var weightedResult = {}
+		criterias.forEach(itm => {
+			imap.search(itm.criteria, function(err, results) {
 				if (err) throw err;
 				console.log("UIDs: ", results);
+				results.forEach(ele => {
+					var key = ele.toString();
+					if (key in weightedResult) {
+						weightedResult[key] += itm.weight;
+					} else {
+						weightedResult[key] = itm.weight;
+					}
+				});
 				/*
 				// var f = imap.fetch(results, { bodies: '' });
 				var f = imap.fetch(results, { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)','TEXT'] });
@@ -127,7 +136,8 @@ imap.once('ready', function() {
 				});
 				*/
 			});
-		})
+		});
+		console.log('weighted result', weightedResult);
 	});
 });
 
@@ -166,13 +176,13 @@ imap.once('end', function() {
 	
 	if (!Array.isArray(search_terms))
 		throw new Error('Expected array for search criteria');
-	criterias = 	[
-								// ['OR',
+	criteria = 	[
+								['OR',
 									[
-										// ['OR',
-										// 	'SEEN',
-										// 	'ANSWERED'
-										// ],
+										['OR',
+											'SEEN',
+											'ANSWERED'
+										],
 										'UNDRAFT', 'UNDELETED',
 										['OR',
 											['TEXT', '6 janvier 1978'],
@@ -180,16 +190,15 @@ imap.once('end', function() {
 										]
 									],
 									[
-										// 'SEEN',
+										'SEEN',
 										'UNDRAFT', 'UNDELETED',
 										['OR',
 											['TEXT', 'Informatique et Libertés'],
 											['TEXT', 'L121-21']
 										]
 									]
-								// ]
+								]
 							]
-	/*
 	search_terms.forEach(ele => {
 		var searchargs = [];
 		var keywordsCriteria = [];
@@ -209,10 +218,9 @@ imap.once('end', function() {
 		// console.log('after keywords', keywords);
 		// console.log('keywordsCriteria', JSON.stringify(keywordsCriteria));
 		console.log('searchargs', JSON.stringify(searchargs));
-		criterias.push(searchargs);
-	});
-	*/
 
+		criterias.push({criteria: searchargs, weight: ele.weight});
+	});
 	// console.log('criterias', JSON.stringify(criterias));
 
 	function mkKeywordsCriteria(keywords) {
@@ -227,5 +235,24 @@ imap.once('end', function() {
 		}
 		return keywords;
 	}
+/*
+	var arr1 = [10,11,12,13,14,15]
+	var arr2 = [7,8,9,10,11,12]
+	var arr3 = [...new Set([...arr1, ...arr2])];
+	var scoreArr = arr3.map(itm => {
+		var newItm = 0;
+		if (arr1.indexOf(itm) >= 0) newItm += 25
+		if (arr2.indexOf(itm) >= 0) newItm += 15
+		return newItm
+	})
+	var scoreObj = {}
+	arr3.forEach((key, index) => {
+		scoreObj[key] = scoreArr[index];
+	});
+		
+	console.log('array3', arr3);
+	console.log('scoreArr', scoreArr);
+	console.log('scoreObj', scoreObj);
+*/
 	imap.connect();
 })();
