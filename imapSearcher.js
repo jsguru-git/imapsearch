@@ -50,7 +50,7 @@ function extractMessags(w_results) {
 		msg.once('end', function() {
 			var msgInfo = {uid, weight, flags, header};
 			(msgArrByDomain[domain] = msgArrByDomain[domain] || []).push(msgInfo);
-			console.log(prefix + 'message Info:', msgInfo);
+			// console.log(prefix + 'message Info:', msgInfo);
 			console.log(prefix + 'Finished');
 		});
 	});
@@ -66,7 +66,7 @@ function extractMessags(w_results) {
 		
 		var finalResult = {};
 		finalResult.emails = {domains: msgArrByDomain};
-		// console.log('Final Results', inspect(finalResult, false, 8));
+		console.log('Final Results', inspect(finalResult, false, 8));
 		console.log('Done fetching all messages!');
 		fs.writeFileSync('./data.json', inspect(finalResult, false, 8), 'utf-8');
 		imap.end();
