@@ -1,5 +1,5 @@
 var Imap = require('imap'),
-		inspect = require('util').inspect;
+	inspect = require('util').inspect;
 var fs = require('fs'), fileStream;
 var criterias = [];
 
