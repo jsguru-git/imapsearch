@@ -26,3 +26,6 @@
     }
 ]
 ```
+Run the following command.
+
+> node imapSearcher.js
