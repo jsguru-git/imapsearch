@@ -1,7 +1,7 @@
-#Searching emails with weighted search.
+# Searching emails with weighted search.
 
-##search items example
-
+## search items example
+```
 [
     {
         "weight": 15,
@@ -25,3 +25,4 @@
         "keywords": ["Informatique et Libertes", "L121-21", "Informatique et Libertés"]
     }
 ]
+```
